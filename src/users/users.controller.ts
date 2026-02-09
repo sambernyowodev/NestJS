@@ -1,32 +1,32 @@
 import { Controller, Get, Post, Put, Patch, Delete, Param, Query, Body, Headers, Ip, ParseIntPipe, DefaultValuePipe, ValidationPipe } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
-import { GetUsersPramDto } from './dtos/get-users-pram.dto';
+import { GetUsersParamDto } from './dtos/get-users-param.dto';
 import { PatchUserDto } from './dtos/patch-user.dto';
-import { UserService } from './providers/user.service';
+import { UsersService } from './providers/users.service';
 
 @Controller('users')
 export class UsersController {
 
     constructor(
-        // Injction UserService
-        private readonly userService: UserService
+        // Injction UsersService
+        private readonly usersService: UsersService
     ) {}
 
 
     @Get('{/:id}')
     public getUsers(
-        @Param() GetUsersPramDto: GetUsersPramDto, 
-        @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number | undefined,
-        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number | undefined)
+        @Param() getUsersParamDto: GetUsersParamDto, 
+        @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number)
     {
-        return this.userService.findAll(GetUsersPramDto, limit, page);
+        return this.usersService.findAll(getUsersParamDto, limit, page);
     }
 
     @Post()
     public createUser(@Body() createUserDto: CreateUserDto) 
     {
         console.log(createUserDto);
-        return 'User created';
+        return this.usersService.createUser(createUserDto);
     }
 
     @Patch()

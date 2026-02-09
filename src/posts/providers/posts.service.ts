@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UserService } from 'src/users/providers/user.service';
+import { UsersService } from 'src/users/providers/users.service';
 
 @Injectable()
 export class PostsService {
@@ -7,10 +7,10 @@ export class PostsService {
         /*
         * injection User Service
         */
-       private readonly userService: UserService
+       private readonly usersService: UsersService
     ){}
     public findAll(userId: string){
-        const user = this.userService.findOneById(userId);
+        const user = this.usersService.findOneById(userId);
         return [
             {
                 user: user,

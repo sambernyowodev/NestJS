@@ -1,7 +1,7 @@
 import { Type } from "class-transformer";
 import { IsInt, IsOptional } from "class-validator";
 
-export class GetUsersPramDto {
+export class GetUsersParamDto {
     @IsOptional()
     @IsInt()
     @Type(() => Number)
