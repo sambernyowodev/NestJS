@@ -8,27 +8,32 @@ import {
   IsString,
   IsUrl,
   Matches,
+  MaxLength,
+  Min,
   MinLength,
   ValidateNested,
 } from 'class-validator';
-import { CreatePostMetaOptionsDto } from './create-post-meta-options.dto';
+
+import { CreatePostMetaOptionsDto } from '../../meta-options/dtos/create-post-meta-options.dto';
+import { Type } from 'class-transformer';
 import { postStatus } from '../enums/post-status.enum';
 import { postType } from '../enums/post-type.enum';
-import { Type } from 'class-transformer';
-
 
 export class CreatePostDto {
   @IsString()
   @MinLength(4)
+  @MaxLength(512)
   @IsNotEmpty()
   title: string;
 
   @IsEnum(postType)
   @IsNotEmpty()
-  postType: string;
+  postType: postType;
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(256)
+  @MinLength(4)
   @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
     message:
       'A slug should be all small letters and uses only "-" and without spaces. For example "my-url"',
@@ -39,31 +44,32 @@ export class CreatePostDto {
   @IsNotEmpty()
   status: postStatus;
 
-  @IsOptional()
   @IsString()
-  content: string;
+  @IsOptional()
+  content?: string;
 
   @IsOptional()
   @IsJSON()
-  schema: string;
+  schema?: string;
 
   @IsOptional()
+  @MinLength(4)
+  @MaxLength(1024)
   @IsUrl()
-  featuredImageUrl: string;
+  featuredImageUrl?: string;
 
   @IsISO8601()
   @IsOptional()
-  publishOn: Date;
+  publishOn?: Date;
 
-  @IsArray()
   @IsOptional()
+  @IsArray()
   @IsString({ each: true })
   @MinLength(3, { each: true })
-  tags: string[];
+  tags?: string[];
 
   @IsOptional()
-  @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreatePostMetaOptionsDto)
-  metaOptions: CreatePostMetaOptionsDto[];
+  metaOptions?: CreatePostMetaOptionsDto;
 }
