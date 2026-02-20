@@ -1,10 +1,9 @@
 import { CreatePostDto } from '../dtos/create-post.dto';
-import { Injectable } from '@nestjs/common';
+import { Body, Injectable, NotFoundException } from '@nestjs/common';
 import { UsersService } from '../../users/providers/users.service';
 import { Repository } from 'typeorm';
 import { Post } from '../post.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MetaOption } from '../../meta-options/meta-options.entity';
 
 @Injectable()
 export class PostsService {
@@ -19,52 +18,37 @@ export class PostsService {
      */
     @InjectRepository(Post)
     private readonly postsRepository: Repository<Post>,
-
-    /**
-     * Inject metaOptionsRepository
-     */
-    @InjectRepository(MetaOption)
-    private readonly metaOptionsRepository: Repository<MetaOption>,
   ) {}
 
   /**
    * Method to create a new post
    */
-  public async create(createPostDto: CreatePostDto) {
-    // Create the metaOptions first if they exist
-    let metaOptions = createPostDto.metaOptions
-      ? this.metaOptionsRepository.create(createPostDto.metaOptions)
-      : null;
+  public async create(@Body() createPostDto: CreatePostDto) {
+    let author = await this.usersService.findOneById(createPostDto.authorId);
 
-    if (metaOptions) {
-      await this.metaOptionsRepository.save(metaOptions);
+    if (!author) {
+      throw new NotFoundException('Author tidak ditemukan!');
     }
 
     // Create the post
-    let post = this.postsRepository.create(createPostDto);
-
-    // If meta options exist add them to post
-    if (metaOptions) {
-      post.metaOptions = metaOptions;
-    }
+    let post = this.postsRepository.create({
+      ...createPostDto,
+      author: author,
+    });
 
     return await this.postsRepository.save(post);
   }
 
-  public findAll(userId: string) {
-    const user = this.usersService.findOneById(userId);
+  public async findAll(userId: number) {
 
-    return [
-      {
-        user: user,
-        title: 'Test Tile',
-        content: 'Test Content',
-      },
-      {
-        user: user,
-        title: 'Test Tile 2',
-        content: 'Test Content 2',
-      },
-    ];
+    let posts = await this.postsRepository.find();
+
+    return posts;
+  }
+
+  public async delete(id: number) {
+    await this.postsRepository.delete(id);
+
+    return { deleted: true, id };
   }
 }
