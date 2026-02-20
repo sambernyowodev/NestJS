@@ -1,15 +1,18 @@
 import {
   Column,
   Entity,
+  ManyToMany,
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
+  JoinTable,
 } from 'typeorm';
 
 import { postStatus } from './enums/post-status.enum';
 import { postType } from './enums/post-type.enum';
 import { MetaOption } from '../meta-options/meta-options.entity';
 import { User } from 'src/users/user.entity';
+import { Tag } from '../tags/tag.entity';
 
 @Entity()
 export class Post {
@@ -81,6 +84,7 @@ export class Post {
   @ManyToOne(() => User, (user) => user.posts, { eager: true })
   author: User;
 
-  // Work on these in lecture on relationships
-  tags?: string[];
+  @ManyToMany(() => Tag, (tag) => tag.posts, { eager: true })
+  @JoinTable()
+  tags?: Tag[];
 }
