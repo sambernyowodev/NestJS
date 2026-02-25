@@ -9,11 +9,13 @@ import {
   RequestTimeoutException,
 } from '@nestjs/common';
 import { User } from '../user.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import type { ConfigType } from '@nestjs/config';
 import profileConfig from '../config/profile.config';
+import { UsersCreateManyProvider } from './user-create-many.providers';
+import { CreateManyUsersDto } from '../dtos/create-many-users.dto';
 
 /**
  * Controller class for '/users' API endpoint
@@ -30,6 +32,11 @@ export class UsersService {
     // Injecting ConfigService
     @Inject(profileConfig.KEY)
     private readonly profileConfiguration: ConfigType<typeof profileConfig>,
+
+    /**
+     * Inject UsersCreateMany provider
+     */
+    private readonly usersCreateManyProvider: UsersCreateManyProvider,
   ) {}
 
   public async createUser(createUserDto: CreateUserDto) {
@@ -79,6 +86,7 @@ export class UsersService {
     // Create the user
     return newUser;
   }
+
 
   /**
    * Public method responsible for handling GET request for '/users' endpoint
@@ -132,5 +140,9 @@ export class UsersService {
     }
 
     return user;
+  }
+
+  public async createMany(createManyUsersDto: CreateManyUsersDto) {
+    return await this.usersCreateManyProvider.createMany(createManyUsersDto);
   }
 }

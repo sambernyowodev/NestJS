@@ -1,6 +1,12 @@
 import { CreatePostDto } from '../dtos/create-post.dto';
 import { PatchPostDto } from '../dtos/patch-post.dto';
-import { BadRequestException, Body, Injectable, NotFoundException, RequestTimeoutException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Injectable,
+  NotFoundException,
+  RequestTimeoutException,
+} from '@nestjs/common';
 import { UsersService } from '../../users/providers/users.service';
 import { TagsService } from '../../tags/providers/tags.service';
 import { Repository } from 'typeorm';
@@ -25,7 +31,7 @@ export class PostsService {
     /**
      * Injecting Tags Service
      */
-     private readonly tagsService: TagsService,
+    private readonly tagsService: TagsService,
   ) {}
 
   /**
@@ -39,7 +45,9 @@ export class PostsService {
     }
 
     // Find Tags
-    let tags = await this.tagsService.findMultipleTags(createPostDto.tags || []);
+    let tags = await this.tagsService.findMultipleTags(
+      createPostDto.tags || [],
+    );
 
     // Create the post
     let post = this.postsRepository.create({
@@ -52,7 +60,6 @@ export class PostsService {
   }
 
   public async findAll(userId: number) {
-
     let posts = await this.postsRepository.find();
 
     return posts;
@@ -118,7 +125,8 @@ export class PostsService {
     post.status = patchPostDto.status ?? post.status;
     post.postType = patchPostDto.postType ?? post.postType;
     post.slug = patchPostDto.slug ?? post.slug;
-    post.featuredImageUrl = patchPostDto.featuredImageUrl ?? post.featuredImageUrl;
+    post.featuredImageUrl =
+      patchPostDto.featuredImageUrl ?? post.featuredImageUrl;
     post.publishOn = patchPostDto.publishOn ?? post.publishOn;
 
     // Assign the new tags
